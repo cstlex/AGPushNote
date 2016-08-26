@@ -12,7 +12,7 @@
 #define isIOS7 (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1)
 #define PUSH_VIEW [AGPushNoteView sharedPushView]
 
-#define CLOSE_PUSH_SEC 5
+#define CLOSE_PUSH_SEC 3
 #define SHOW_ANIM_DUR 0.5
 #define HIDE_ANIM_DUR 0.35
 
@@ -67,7 +67,7 @@ static AGPushNoteView *_sharedPushView;
         // Initialization code
         CGRect f = self.frame;
         CGFloat width = [UIApplication sharedApplication].keyWindow.bounds.size.width;
-        self.frame = CGRectMake(f.origin.x, f.origin.y, width, f.size.height);
+        self.frame = CGRectMake(f.origin.x, f.origin.y, width, 64.0f);
     }
     return self;
 }
@@ -75,11 +75,12 @@ static AGPushNoteView *_sharedPushView;
 - (void)setUpUI {
     CGRect f = self.frame;
     CGFloat width = [UIApplication sharedApplication].keyWindow.bounds.size.width;
-    CGFloat height = isIOS7? 54: f.size.height;
+    CGFloat height = isIOS7? 64: f.size.height;
     self.frame = CGRectMake(f.origin.x, -height, width, height);
     
     CGRect cvF = self.containerView.frame;
-    self.containerView.frame = CGRectMake(cvF.origin.x, cvF.origin.y, self.frame.size.width, cvF.size.height);
+    self.containerView.frame = CGRectMake(cvF.origin.x, 0, self.frame.size.width-60.0f, height);
+    self.messageLabel.frame = CGRectMake(0.0f, 30.0f, self.frame.size.width-60.0f, height-30.0f);
     
     //OS Specific:
     if (isIOS7) {
@@ -102,9 +103,9 @@ static AGPushNoteView *_sharedPushView;
     [self.messageLabel addGestureRecognizer:msgTap];
     
     //:::[For debugging]:::
-    //            self.containerView.backgroundColor = [UIColor yellowColor];
+//                self.containerView.backgroundColor = [UIColor yellowColor];
     //            self.closeButton.backgroundColor = [UIColor redColor];
-    //            self.messageLabel.backgroundColor = [UIColor greenColor];
+//                self.messageLabel.backgroundColor = [UIColor greenColor];
     
     [APP.window addSubview:PUSH_VIEW];
 }
@@ -129,7 +130,7 @@ static AGPushNoteView *_sharedPushView;
         [PUSH_VIEW.pendingPushArr addObject:message];
         
         PUSH_VIEW.messageLabel.text = message;
-        APP.window.windowLevel = UIWindowLevelStatusBar;
+//        APP.window.windowLevel = UIWindowLevelStatusBar;
         
         CGRect f = PUSH_VIEW.frame;
         PUSH_VIEW.frame = CGRectMake(f.origin.x, -f.size.height, f.size.width, f.size.height);
@@ -147,7 +148,7 @@ static AGPushNoteView *_sharedPushView;
         }];
         
         //Start timer (Currently not used to make sure user see & read the push...)
-//        PUSH_VIEW.closeTimer = [NSTimer scheduledTimerWithTimeInterval:CLOSE_PUSH_SEC target:[IAAPushNoteView class] selector:@selector(close) userInfo:nil repeats:NO];
+        PUSH_VIEW.closeTimer = [NSTimer scheduledTimerWithTimeInterval:CLOSE_PUSH_SEC target:[AGPushNoteView class] selector:@selector(close) userInfo:nil repeats:NO];
     }
 }
 + (void)closeWitCompletion:(void (^)(void))completion {
